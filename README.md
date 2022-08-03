@@ -1,4 +1,4 @@
-# SE233-CURRENCY-WATCHER, Exercise Submission
+# se233-currency-watcher, Exercise Submission
 > Written by 642115032 Putthipong Ninwong
 
 > Email: putthipong_ninwong@cmu.ac.th
