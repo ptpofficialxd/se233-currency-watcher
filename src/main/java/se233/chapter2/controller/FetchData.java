@@ -1,0 +1,66 @@
+package se233.chapter2.controller;
+
+import org.apache.commons.io.IOUtils;
+import org.json.JSONException;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
+import org.json.JSONObject;
+import se233.chapter2.model.CurrencyEntity;
+
+public class FetchData {
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    public static ArrayList<CurrencyEntity> fetch_range(String src, int N) throws JSONException {
+        String dateEnd = LocalDate.now().format(formatter);
+        String dateStart = LocalDate.now().minusDays(N).format(formatter);
+        String apiKey = "e51833fcadf73ce39b74";
+        String url_str = String.format("https://free.currconv.com/api/v7/convert?q=%s_THB&compact=ultra&date=%s&endDate=%s&apiKey=%s", src, dateStart, dateEnd, apiKey);
+        // Exercise 1 Show the historical exchange rate up to 14 days as requested by the client.
+        // AllEventHandlers, Initialize
+        // START
+        String DateEnd2 = LocalDate.now().minusDays(N).format(formatter);
+        String DateStart2 = LocalDate.now().minusDays(N+N+1).format(formatter);
+        String url_str2 = String.format("https://free.currconv.com/api/v7/convert?q=%s_THB&compact=ultra&date=%s&endDate=%s&apiKey=%s", src, DateStart2, DateEnd2 ,apiKey);
+        ArrayList<CurrencyEntity> histList = new ArrayList<>();
+        String retrievedJson = null;
+        String retrievedJson2 = null;
+        try {
+            retrievedJson = IOUtils.toString(new URL(url_str), Charset.defaultCharset());
+            retrievedJson2 = IOUtils.toString(new URL(url_str2), Charset.defaultCharset());
+        } catch (MalformedURLException e) {
+            System.out.println("Encountered a Malformed Url exception");
+        } catch (IOException e) {
+            System.out.println("Encounter an IO exception");
+        }
+        JSONObject jsonOBJ = new JSONObject(retrievedJson).getJSONObject(String.format("%s_THB", src));
+        JSONObject jsonOBJ2 = new JSONObject(retrievedJson2).getJSONObject(String.format("%s_THB",src));
+        Iterator keysToCopyIterator = jsonOBJ.keys();
+        Iterator keyToCopyIterator2 = jsonOBJ2.keys();
+        while (keysToCopyIterator.hasNext()) {
+            String key = (String) keysToCopyIterator.next();
+            Double rate = Double.parseDouble(jsonOBJ.get(key).toString());
+            histList.add(new CurrencyEntity(rate, key));
+        }
+        while(keyToCopyIterator2.hasNext()){
+            String key = (String) keyToCopyIterator2.next();
+            double rate = Double.parseDouble(jsonOBJ2.get(key).toString());
+            histList.add(new CurrencyEntity(rate, key));
+        }
+        // Exercise 1
+        // END
+        histList.sort(new Comparator<CurrencyEntity>() {
+            @Override
+            public int compare(CurrencyEntity o1, CurrencyEntity o2) {
+                return o1.getTimestamp().compareTo(o2.getTimestamp());
+            }
+        });
+
+        return histList;
+    }
+}
