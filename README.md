@@ -9,6 +9,6 @@
 Exercise of SE233 Advanced programming Section 702 course.  
 
 ## Preview of the program
-![Preview2 img](./preview2.png)
+![Preview img](./preview.png)
 
 # 642115032 Putthipong Ninwong
